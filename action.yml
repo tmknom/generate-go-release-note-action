@@ -1,23 +1,84 @@
-name: Rename me
+name: Generate Go Release Note
 description: |
-  Template repository for creating Composite Action with GitHub Actions.
+  This action generates structured, ready-to-use release notes for Go projects.
+  The notes are provided in Markdown format and include installation instructions, artifact verification steps, and examples for using container images.
 
   ## Usage
 
-  Write usage for your Composite Action.
-
   ```yaml
     steps:
-      - name: Template
-        uses: tmknom/template-composite-action@v0
+      - name: Generate Go Release Note
+        uses: tmknom/generate-go-release-note-action@v0
+        with:
+          artifact-name: pseudo
+          version-tag: v1.2.3
+          image-digest: sha256:abc123
+          release-workflow-ref: tmknom/release-workflows/.github/workflows/go.yml@abc123
   ```
+
+inputs:
+  artifact-name:
+    required: true
+    description: The name of the release artifact, typically the executable binary or container image name.
+  version-tag:
+    required: true
+    description: The GitHub release version tag in semantic versioning format (e.g., `v1.2.3`).
+  image-digest:
+    required: true
+    description: The digest (algorithm:hex) of the released container image (e.g., `sha256:abc123`).
+  release-workflow-ref:
+    required: true
+    description: The full GitHub reference (owner/repo/path@ref) to the release workflow (e.g., `tmknom/release-workflows/.github/workflows/go.yml@abc123`).
+
+outputs:
+  release-note-path:
+    value: ${{ steps.generate.outputs.release-note }}
+    description: The filepath to the generated release note in Markdown format.
 
 runs:
   using: composite
 
   steps:
-    - name: Run
-      shell: bash
+    - name: Create working directory
+      id: work
       run: |
+        echo "::group::Create working directory"
         set -x
-        echo "Write steps"
+        repo="$(cut -d / -f 7 <<<"${GITHUB_ACTION_PATH/./${GITHUB_REPOSITORY_ID}}")"
+        owner="$(cut -d / -f 6 <<<"${GITHUB_ACTION_PATH}")"
+        sha256="$(sha256sum "${GITHUB_ACTION_PATH}/action.yml" | cut -d ' ' -f 1)"
+
+        workdir="${RUNNER_TEMP}/__${owner}-${repo}-${sha256}"
+        echo "dir=${workdir}" >> "${GITHUB_OUTPUT}"
+        mkdir -p "${workdir}"
+        echo "::endgroup::"
+      shell: bash
+
+    - name: Generate release note
+      id: generate
+      working-directory: ${{ steps.work.outputs.dir }}
+      env:
+        ARTIFACT_NAME: ${{ inputs.artifact-name }}
+        VERSION_TAG: ${{ inputs.version-tag }}
+        IMAGE_DIGEST: ${{ inputs.image-digest }}
+        CERTIFICATE_IDENTITY: ${{ github.server_url }}/${{ inputs.release-workflow-ref }}
+        CERTIFICATE_OIDC_ISSUER: https://token.actions.githubusercontent.com
+      run: |
+        echo "::group::Generate release note"
+        set -x
+        filepath="${PWD}/release_note.md"
+        echo "release-note=${filepath}" >> "${GITHUB_OUTPUT}"
+
+        export VERSION="${VERSION_TAG#v}"
+        envsubst < "${GITHUB_ACTION_PATH}/template.md" > "${filepath}"
+        echo "::endgroup::"
+      shell: bash
+
+    - name: Show release note
+      env:
+        RELEASE_NOTE: ${{ steps.generate.outputs.release-note }}
+      run: |
+        echo "::group::Show release note"
+        cat "${RELEASE_NOTE}"
+        echo "::endgroup::"
+      shell: bash
