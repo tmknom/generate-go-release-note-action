@@ -25,24 +25,20 @@ jobs:
       - name: Checkout
         uses: tmknom/checkout-action@v1
 
-      - name: Setup
-        run: |
-          set -x
-          echo "Setup"
-
       - name: Exercise
         id: exercise
         uses: ./
+        with:
+          artifact-name: pseudo
+          version-tag: v1.2.3
+          image-digest: sha256:abc123
+          release-workflow-ref: tmknom/release-workflows/.github/workflows/go.yml@abc123
 
       - name: Verify
         env:
-          OUTCOME: ${{ steps.exercise.outcome }}
+          RELEASE_NOTE: ${{ steps.exercise.outputs.release-note-path }}
         run: |
           set -x
-          test "${OUTCOME}" = "success"
-
-      - name: Teardown
-        if: ${{ always() }}
-        run: |
-          set -x
-          echo "Teardown"
+          grep "https://github.com/${GITHUB_REPOSITORY}/releases/download/1.2.3/pseudo_1.2.3_linux_amd64" "${RELEASE_NOTE}"
+          grep "docker pull ghcr.io/${GITHUB_REPOSITORY}@sha256:abc123" "${RELEASE_NOTE}"
+          grep "https://github.com/tmknom/release-workflows/.github/workflows/go.yml@abc123" "${RELEASE_NOTE}"
