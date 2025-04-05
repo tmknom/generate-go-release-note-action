@@ -1,30 +1,41 @@
-# template-composite-action
+# generate-go-release-note-action
 
-Template repository for Composite Action.
+Generates a release note for Go.
 
 <!-- actdocs start -->
 
 ## Description
 
-Template repository for creating Composite Action with GitHub Actions.
+This action generates structured, ready-to-use release notes for Go projects.
+The notes are provided in Markdown format and include installation instructions, artifact verification steps, and examples for using container images.
 
 ## Usage
 
-Write usage for your Composite Action.
-
 ```yaml
   steps:
-    - name: Template
-      uses: tmknom/template-composite-action@v0
+    - name: Generate Go Release Note
+      uses: tmknom/generate-go-release-note-action@v0
+      with:
+        artifact-name: pseudo
+        version-tag: v1.2.3
+        image-digest: sha256:abc123
+        release-workflow-ref: tmknom/release-workflows/.github/workflows/go.yml@abc123
 ```
 
 ## Inputs
 
-N/A
+| Name | Description | Default | Required |
+| :--- | :---------- | :------ | :------: |
+| artifact-name | The name of the release artifact, typically the executable binary or container image name. | n/a | yes |
+| image-digest | The digest (algorithm:hex) of the released container image (e.g., `sha256:abc123`). | n/a | yes |
+| release-workflow-ref | The full GitHub reference (owner/repo/path@ref) to the release workflow (e.g., `tmknom/release-workflows/.github/workflows/go.yml@abc123`). | n/a | yes |
+| version-tag | The GitHub release version tag in semantic versioning format (e.g., `v1.2.3`). | n/a | yes |
 
 ## Outputs
 
-N/A
+| Name | Description |
+| :--- | :---------- |
+| release-note-path | The filepath to the generated release note in Markdown format. |
 
 <!-- actdocs end -->
 
@@ -44,4 +55,4 @@ N/A
 
 See [GitHub Releases][releases].
 
-[releases]: https://github.com/tmknom/template-composite-action/releases
+[releases]: https://github.com/tmknom/generate-go-release-note-action/releases
