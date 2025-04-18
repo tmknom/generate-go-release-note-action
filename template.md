@@ -63,13 +63,13 @@ All artifacts are checksummed, and signed by Cosign using identity-based ("keyle
     ```
 3. Verify the signature using:
     ```shell
-    cosign verify-blob \\
-      --signature "${ARTIFACT_NAME}_${VERSION}_checksums.txt.sig" \\
-      --certificate "${ARTIFACT_NAME}_${VERSION}_checksums.txt.pem" \\
-      --certificate-oidc-issuer "${CERTIFICATE_OIDC_ISSUER}" \\
-      --certificate-identity "${CERTIFICATE_IDENTITY}" \\
-      --certificate-github-workflow-repository "${GITHUB_REPOSITORY}" \\
-      --certificate-github-workflow-sha "${GITHUB_SHA}" \\
+    cosign verify-blob \
+      --signature "${ARTIFACT_NAME}_${VERSION}_checksums.txt.sig" \
+      --certificate "${ARTIFACT_NAME}_${VERSION}_checksums.txt.pem" \
+      --certificate-oidc-issuer "${CERTIFICATE_OIDC_ISSUER}" \
+      --certificate-identity "${CERTIFICATE_IDENTITY}" \
+      --certificate-github-workflow-repository "${GITHUB_REPOSITORY}" \
+      --certificate-github-workflow-sha "${GITHUB_SHA}" \
       "${ARTIFACT_NAME}_${VERSION}_checksums.txt"
     ```
 4. Verify the checksum of the downloaded files using:
@@ -86,13 +86,13 @@ For example, the `linux/amd64` binary:
 1. Install [Cosign](https://github.com/sigstore/cosign) if not already available.
 2. Verify the signature using:
     ```shell
-    cosign verify-blob \\
-      --signature "${ARTIFACT_NAME}_${VERSION}_linux_amd64.sig" \\
-      --certificate "${ARTIFACT_NAME}_${VERSION}_linux_amd64.pem" \\
-      --certificate-oidc-issuer "${CERTIFICATE_OIDC_ISSUER}" \\
-      --certificate-identity "${CERTIFICATE_IDENTITY}" \\
-      --certificate-github-workflow-repository "${GITHUB_REPOSITORY}" \\
-      --certificate-github-workflow-sha "${GITHUB_SHA}" \\
+    cosign verify-blob \
+      --signature "${ARTIFACT_NAME}_${VERSION}_linux_amd64.sig" \
+      --certificate "${ARTIFACT_NAME}_${VERSION}_linux_amd64.pem" \
+      --certificate-oidc-issuer "${CERTIFICATE_OIDC_ISSUER}" \
+      --certificate-identity "${CERTIFICATE_IDENTITY}" \
+      --certificate-github-workflow-repository "${GITHUB_REPOSITORY}" \
+      --certificate-github-workflow-sha "${GITHUB_SHA}" \
       "${ARTIFACT_NAME}_${VERSION}_linux_amd64"
     ```
 
@@ -104,10 +104,10 @@ For example, the `linux/amd64` binary:
 1. Install [GitHub CLI](https://cli.github.com/) if not already available.
 2. Verify the attestation:
     ```shell
-    gh attestation verify "${ARTIFACT_NAME}_${VERSION}_linux_amd64" \\
-      --deny-self-hosted-runners \\
-      --repo "${GITHUB_REPOSITORY}" \\
-      --cert-oidc-issuer "${CERTIFICATE_OIDC_ISSUER}" \\
+    gh attestation verify "${ARTIFACT_NAME}_${VERSION}_linux_amd64" \
+      --deny-self-hosted-runners \
+      --repo "${GITHUB_REPOSITORY}" \
+      --cert-oidc-issuer "${CERTIFICATE_OIDC_ISSUER}" \
       --cert-identity "${CERTIFICATE_IDENTITY}"
     ```
 
@@ -134,11 +134,11 @@ You can verify container images using Cosign.
 1. Install [Cosign](https://github.com/sigstore/cosign) if not already available.
 2. Verify the signature using:
     ```shell
-    cosign verify \\
-      --certificate-oidc-issuer "${CERTIFICATE_OIDC_ISSUER}" \\
-      --certificate-identity "${CERTIFICATE_IDENTITY}" \\
-      --certificate-github-workflow-repository "${GITHUB_REPOSITORY}" \\
-      --certificate-github-workflow-sha "${GITHUB_SHA}" \\
+    cosign verify \
+      --certificate-oidc-issuer "${CERTIFICATE_OIDC_ISSUER}" \
+      --certificate-identity "${CERTIFICATE_IDENTITY}" \
+      --certificate-github-workflow-repository "${GITHUB_REPOSITORY}" \
+      --certificate-github-workflow-sha "${GITHUB_SHA}" \
       ghcr.io/${GITHUB_REPOSITORY}@${IMAGE_DIGEST}
     ```
 
@@ -149,9 +149,9 @@ You can verify container images using GitHub Artifact Attestations.
 1. Install [GitHub CLI](https://cli.github.com/) if not already available.
 2. Verify the attestation:
     ```shell
-    gh attestation verify oci://ghcr.io/${GITHUB_REPOSITORY}@${IMAGE_DIGEST} \\
-      --deny-self-hosted-runners \\
-      --repo "${GITHUB_REPOSITORY}" \\
-      --cert-oidc-issuer "${CERTIFICATE_OIDC_ISSUER}" \\
+    gh attestation verify oci://ghcr.io/${GITHUB_REPOSITORY}@${IMAGE_DIGEST} \
+      --deny-self-hosted-runners \
+      --repo "${GITHUB_REPOSITORY}" \
+      --cert-oidc-issuer "${CERTIFICATE_OIDC_ISSUER}" \
       --cert-identity "${CERTIFICATE_IDENTITY}"
     ```
